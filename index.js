@@ -1,16 +1,12 @@
+var Datastore = require('nedb'), memberDB = new Datastore({ filename: './db/members', autoload: true });
 const vorpal = require('vorpal')();
 const keyevents = require('key-events');
-const keys = keyevents();
+const EnrollMember = require('./forms/EnrollMember').EnrollMember;
+const prompts = require('prompts');
 
 let state = {
     monitor: false
 }
-
-setInterval(() => {
-    if (state.monitor) {
-        console.log(`\nMember #${Math.floor(Math.random() * 9000000)} : Checked In!`);
-    }
-}, 10000);
 
 // Start of Vorpal Commands
 console.clear();
@@ -30,21 +26,41 @@ vorpal.command('clear', 'Clear console.').action(function(args, callback) {
     callback();
 });
 
+vorpal.command('enroll member', 'Clear console.').action(async function(args, callback) {
+    let newMember = await EnrollMember();
+    memberDB.insert(newMember, (err, newDoc) => {
+        callback();
+    })
+});
+
+
 vorpal.command('monitor', 'Enables monitoring of member scanning in.').action(function(args, callback) {
     state.monitor = true;
     console.clear();
     callback();
 });
 
-vorpal.command('search trainer', 'Search for trainer by name or ID.').action(function(args, callback) {
+vorpal.command('search trainer', 'Search for trainer by last name or ID.').action(function(args, callback) {
     state.monitor = true;
     this.log('bar');
     callback();
 });
 
-vorpal.command('search member', 'Search for member by name or ID.').action(function(args, callback) {
-    state.monitor = true;
-    this.log('bar');
+vorpal.command('search member', 'Search for member by last name or ID.').action(async function(args, callback) {
+    const lastNameSearch = await prompts({
+        type: 'text',
+        name: 'value',
+        message: 'ID / Last Name',
+    });
+    if (isNaN(lastNameSearch.value)) {
+        memberDB.find({ last: lastNameSearch.value.toLowerCase() }, function (err, docs) {
+            console.log(docs + '\n')
+        });
+    } else {
+        memberDB.find({ memberID: parseInt(lastNameSearch.value) }, function (err, docs) {
+            console.log(docs + '\n')
+        });
+    }
     callback();
 });
 

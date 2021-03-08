@@ -10,6 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "key-events": "^0.1.1",
+    "nedb": "^1.8.0",
+    "prompts": "^2.4.0",
     "vorpal": "^1.12.0"
   }
 }
