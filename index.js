@@ -54,11 +54,15 @@ vorpal.command('search member', 'Search for member by last name or ID.').action(
     });
     if (isNaN(lastNameSearch.value)) {
         memberDB.find({ last: lastNameSearch.value.toLowerCase() }, function (err, docs) {
-            console.log(docs + '\n')
+            console.log('');
+            console.log(docs);
+            vorpal.delimiter('gym$').show();
         });
     } else {
         memberDB.find({ memberID: parseInt(lastNameSearch.value) }, function (err, docs) {
-            console.log(docs + '\n')
+            console.log('');
+            console.log(docs);
+            vorpal.delimiter('gym$').show();
         });
     }
     callback();
