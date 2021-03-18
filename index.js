@@ -1,7 +1,10 @@
-var Datastore = require('nedb'), memberDB = new Datastore({ filename: './db/members', autoload: true });
+var Datastore = require('nedb'), memberDB = new Datastore({ filename: './db/members', autoload: true }), 
+trainerDB = new Datastore({ filename: './db/trainers', autoload: true });
+
 const vorpal = require('vorpal')();
 const keyevents = require('key-events');
 const EnrollMember = require('./forms/EnrollMember').EnrollMember;
+const EnrollTrainer = require('./forms/EnrollTrainer').EnrollTrainer;
 const prompts = require('prompts');
 
 let state = {
@@ -26,6 +29,13 @@ vorpal.command('clear', 'Clear console.').action(function(args, callback) {
     callback();
 });
 
+vorpal.command('enroll trainer', 'Clear console.').action(async function(args, callback) {
+    let newTrainer = await EnrollTrainer();
+    trainerDB.insert(newTrainer, (err, newDoc) => {
+        callback();
+    })
+});
+
 vorpal.command('enroll member', 'Clear console.').action(async function(args, callback) {
     let newMember = await EnrollMember();
     memberDB.insert(newMember, (err, newDoc) => {
@@ -40,9 +50,25 @@ vorpal.command('monitor', 'Enables monitoring of member scanning in.').action(fu
     callback();
 });
 
-vorpal.command('search trainer', 'Search for trainer by last name or ID.').action(function(args, callback) {
-    state.monitor = true;
-    this.log('bar');
+vorpal.command('search trainer', 'Search for trainer by last name or ID.').action(async function(args, callback) {
+    const trainerLastNameSearch = await prompts({
+        type: 'text',
+        name: 'value',
+        message: 'ID / Last Name',
+    });
+    if (isNaN(trainerLastNameSearch.value)) {
+        trainerDB.find({ last: trainerLastNameSearch.value.toLowerCase() }, function (err, docs) {
+            console.log('');
+            console.log(docs);
+            vorpal.delimiter('gym$').show();
+        });
+    } else {
+        trainerDB.find({ trainerID: parseInt(trainerLastNameSearch.value) }, function (err, docs) {
+            console.log('');
+            console.log(docs);
+            vorpal.delimiter('gym$').show();
+        });
+    }
     callback();
 });
 
