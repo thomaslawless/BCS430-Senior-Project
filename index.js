@@ -3,6 +3,7 @@ var Datastore = require('bedb'), classDB = new Datastore({filename: './db/classe
 const vorpal = require('vorpal')();
 const keyevents = require('key-events');
 const EnrollMember = require('./forms/EnrollMember').EnrollMember;
+const CreateClass = require('./forms/CreateClass').CreateClass;
 const prompts = require('prompts');
 
 let state = {
