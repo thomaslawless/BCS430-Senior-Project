@@ -49,6 +49,24 @@ exports.EnrollMember = async () => {
         message: 'Email',
     });
 
+    const ccNumber = await prompts({
+        type: 'text',
+        name: 'value',
+        message: 'Credit Card Number',
+    });
+
+    const ccExpiration = await prompts({
+        type: 'text',
+        name: 'value',
+        message: 'Expiration',
+    });
+
+    const ccSecurityCode = await prompts({
+        type: 'text',
+        name: 'value',
+        message: 'CVV',
+    });
+
     let memberID = Math.floor(Math.random() * 999999);
     console.log(`Member #${memberID} Enrolled!`);
 
@@ -61,6 +79,9 @@ exports.EnrollMember = async () => {
         state: State.value.toLowerCase(),
         zip: Zip.value.toLowerCase(),
         phone: Phone.value.toLowerCase(),
-        email: Email.value.toLowerCase()
+        email: Email.value.toLowerCase(),
+        ccNumber: ccNumber.value.toLowerCase(),
+        ccExpiration: ccExpiration.value.toLowerCase(),
+        ccSecurityCode: ccSecurityCode.value.toLowerCase(),
     }
 }
