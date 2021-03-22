@@ -1,5 +1,7 @@
-var Datastore = require('nedb'), memberDB = new Datastore({ filename: './db/members', autoload: true }), 
+var Datastore = require('nedb');
+memberDB = new Datastore({ filename: './db/members', autoload: true });
 trainerDB = new Datastore({ filename: './db/trainers', autoload: true });
+classDB = new Datastore( {filename: './db/classes', autoload: true} );
 
 const vorpal = require('vorpal')();
 const keyevents = require('key-events');
@@ -92,6 +94,14 @@ vorpal.command('search member', 'Search for member by last name or ID.').action(
         });
     }
     callback();
+});
+
+
+vorpal.command('add class', 'create a new class on the scheduke.').action(function(args, calback){
+    let newClass = await CreateClass();
+    classDB.insert(newClass, (err, newDoc)=> {
+        callback();
+    })
 });
 
 vorpal.delimiter('gym$').show();

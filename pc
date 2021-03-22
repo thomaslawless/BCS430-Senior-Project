@@ -1,0 +1,27 @@
+const allowedCardNetworks = ["AMEX", "DISCOVER", "INTERAC", "JCB", "MASTERCARD", "VISA"];
+
+var card = {
+  "kind": "creditCard",
+  "firstName": "Jennifer",
+  "lastName":"Miliken",
+  "number": "4024007109449982",
+  "verificationValue": "521",
+  "month": "6",
+  "year": "2025",
+  "email": "jmiliken@gmail.com"
+}
+
+String token = request.getParameter("stripeToken");
+
+ChargeCreateParams params =
+  ChargeCreateParams.builder()
+    .setAmount(999L)
+    .setCurrency("usd")
+    .setDescription("gym membership")
+    .setSource(token)
+    .build();
+
+Charge charge = Charge.create(params);
+
+
+    
