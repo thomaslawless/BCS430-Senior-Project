@@ -4,10 +4,12 @@ trainerDB = new Datastore({ filename: './db/trainers', autoload: true });
 classDB = new Datastore( {filename: './db/classes', autoload: true} );
 
 const vorpal = require('vorpal')();
-const keyevents = require('key-events');
+const prompts = require('prompts');
+
 const EnrollMember = require('./forms/EnrollMember').EnrollMember;
 const EnrollTrainer = require('./forms/EnrollTrainer').EnrollTrainer;
-const prompts = require('prompts');
+const CreateClass = require('./forms/CreateClass').CreateClass;
+const JoinClass = require('./forms/JoinClass').JoinClass;
 
 let state = {
     monitor: false
@@ -44,7 +46,6 @@ vorpal.command('enroll member', 'Clear console.').action(async function(args, ca
         callback();
     })
 });
-
 
 vorpal.command('monitor', 'Enables monitoring of member scanning in.').action(function(args, callback) {
     state.monitor = true;
@@ -96,12 +97,40 @@ vorpal.command('search member', 'Search for member by last name or ID.').action(
     callback();
 });
 
-
-vorpal.command('add class', 'create a new class on the scheduke.').action(function(args, calback){
+vorpal.command('add class', 'create a new class on the schedule.').action(async function(args, callback){
     let newClass = await CreateClass();
-    classDB.insert(newClass, (err, newDoc)=> {
+    classDB.insert(newClass, (err, newDoc) => {
         callback();
     })
+});
+
+vorpal.command('search class', 'Search for class by name or ID.').action(async function(args, callback) {
+    const classSearch = await prompts({
+        type: 'text',
+        name: 'value',
+        message: 'Class Name / ID',
+    });
+    if (isNaN(classSearch.value)) {
+        classDB.find({ className: classSearch.value.toLowerCase() }, function (err, docs) {
+            console.log('');
+            console.log(docs);
+            vorpal.delimiter('gym$').show();
+        });
+    } else {
+        classDB.find({ classID: parseInt(classSearch.value) }, function (err, docs) {
+            console.log('');
+            console.log(docs);
+            vorpal.delimiter('gym$').show();
+        });
+    }
+    callback();
+});
+
+vorpal.command('join class', 'create a new class on the schedule.').action(async function(args, callback){
+    let joinedClass = await JoinClass();
+    classDB.update({ classID: parseInt(joinedClass.ClassID) }, { $push: { enrolledMembers: parseInt(joinedClass.MemberID) } }, {}, function (err, numReplaced) {
+        callback();
+    });
 });
 
 vorpal.delimiter('gym$').show();
