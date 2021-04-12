@@ -12,11 +12,17 @@ exports.CreateClass = async () => {
         name: 'value',
         message: 'Instructor',
     });
-// DateTime variable??
-    const timeDate = await prompts({
+
+    const date = await prompts({
         type: 'text',
         name: 'value',
-        message: 'Date and Time of Class',
+        message: 'Date of Class',
+    });
+
+    const time = await prompts({
+        type: 'text',
+        name: 'value',
+        message: 'Time of Class',
     });
 
     const sizeLimit = await prompts({
@@ -32,7 +38,8 @@ exports.CreateClass = async () => {
         classID: classID,
         className: className.value.toLowerCase(),
         instructor: instructor.value.toLowerCase(),
-        timeDate: timeDate.value.toLowerCase(),
+        date: date.value.toLowerCase(),
+        time: time.value.toLowerCase(),
         sizeLimit: sizeLimit.value,
         enrolledMembers: []
     }
