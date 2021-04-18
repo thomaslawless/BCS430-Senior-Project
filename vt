@@ -1,0 +1,55 @@
+//Select input fields
+const trainerIdEl = document.querySelector('#trainerID');
+const nameEl = document.querySelector('#name');
+const emailEl = document.querySelector('#email');
+
+//Validate trainerID
+const checkTrainerId = () => {
+  let vaild = false;
+  const min = 2, max = 10;
+  const trainerId = trainerId.value.trim();
+  
+  if (!isRequired(trainerId)) {
+        showError(trainerIdEl, 'Trainer ID cannot be blank.');
+    } else if (!isBetween(trainerId.length, min, max)) {
+        showError(trainerId, `Trainer ID must be between ${min} and ${max} characters.`)
+    } else {
+        showSuccess(trainerId);
+        valid = true;
+    }
+    return valid;
+}
+
+//Validate trainer name
+const checkName = () => {
+
+    let valid = false;
+    const min = 5,
+        max = 25;
+    const name = nameEl.value.trim();
+
+    if (!isRequired(name)) {
+        showError(nameEl, 'Name cannot be blank.');
+    } else if (!isBetween(name.length, min, max)) {
+        showError(nameEl, `Name must be between ${min} and ${max} characters.`)
+    } else {
+        showSuccess(nameEl);
+        valid = true;
+    }
+    return valid;
+}
+
+//Validate trainer email
+const checkEmail = () => {
+    let valid = false;
+    const email = emailEl.value.trim();
+    if (!isRequired(email)) {
+        showError(emailEl, 'Email cannot be blank.');
+    } else if (!isEmailValid(email)) {
+        showError(emailEl, 'Email is not valid.')
+    } else {
+        showSuccess(emailEl);
+        valid = true;
+    }
+    return valid;
+}
