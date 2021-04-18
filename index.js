@@ -96,6 +96,55 @@ vorpal.command('search trainer', 'Search for trainer by last name or ID\n').acti
     callback();
 });
 
+// ---------------------------------------------------------------------------
+
+vorpal.command('accouting search&send invoice', 'Search for member to send invoice\n').action(async function(args, callback) {
+
+    let invoice = "Inv#"+Math.floor(Math.random() * 999999);
+    
+    const memberSearch = await prompts({
+        type: 'text',
+        name: 'value',
+        message: 'ID / Last Name',
+    });
+    
+    if (isNaN(memberSearch.value)) {
+        memberDB.find({ last: memberSearch.value.toLowerCase() },  function (err, docs) {
+            console.log('');
+            console.log(`${invoice} is sent to ${docs[0].first} ${docs[0].last}!`);
+            vorpal.delimiter('gym$').show();
+        });
+    } else {
+        memberDB.find({ memberID: parseInt(memberSearch.value) }, function (err, docs) {
+            console.log('');
+            console.log(`${invoice} is sent to ${docs[0].first} ${docs[0].last}!`);
+            vorpal.delimiter('gym$').show();
+        });
+    }
+
+    callback();
+  
+});
+
+vorpal.command('accouting send invoice', 'Send invoice to all current members\n').action(async function(args, callback) {
+    
+    memberDB.find({}, function(err, docs){
+        if(err){
+            console.log(err);
+        } else{
+            docs.forEach(doc => {
+                let invoice = "Inv#"+Math.floor(Math.random() * 999999);
+                console.log(`${invoice} is sent to ${doc.first} ${doc.last}!`);
+                vorpal.delimiter('gym$').show();
+            }); 
+            console.log('');
+            vorpal.delimiter('gym$').show();
+        }
+    });
+    
+    callback();
+});
+
 // ------------------------------------------------------------------------
 
 vorpal.command('add class', 'Create a new class').action(async function(args, callback){
