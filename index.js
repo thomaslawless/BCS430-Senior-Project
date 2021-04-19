@@ -78,4 +78,140 @@ vorpal.command('add class', 'create a new class on the scheduke.').action(functi
     })
 });
 
+<<<<<<< Updated upstream
+=======
+vorpal.command('search class', 'Search for class by name or ID').action(async function(args, callback) {
+    const classSearch = await prompts({
+        type: 'text',
+        name: 'value',
+        message: 'Class Name / ID / Time',
+    });
+    if (isNaN(classSearch.value) && !classSearch.value.includes(':')) {
+        classDB.find({ className: classSearch.value.toLowerCase() }, function (err, docs) {
+            console.log('');
+            console.log(docs);
+            vorpal.delimiter('gym$').show();
+        });
+    } else if (classSearch.value.includes(':')) {
+        classDB.find({ time: classSearch.value.toLowerCase() }, function (err, docs) {
+            console.log('');
+            console.log(docs);
+            vorpal.delimiter('gym$').show();
+        });
+    } else {
+        classDB.find({ classID: parseInt(classSearch.value) }, function (err, docs) {
+            console.log('');
+            console.log(docs);
+            vorpal.delimiter('gym$').show();
+        });
+    }
+    callback();
+});
+
+vorpal.command('join class', 'Sign a member up for a class\n').action(async function(args, callback){
+    let joinedClass = await JoinClass();
+    classDB.find({ classID: parseInt(joinedClass.ClassID) }, function (err, docs) {
+        if (docs.length == 0) {
+            console.log("ERROR: Class ID Invalid")
+        } else {
+            if (docs[0].enrolledMembers.length >= docs[0].sizeLimit) { 
+                console.log("ERROR: Class is at max capacity")
+            } else if (docs[0].enrolledMembers.includes(parseInt(joinedClass.MemberID))) {
+                console.log("ERROR: Member is already in this class")
+            } else {
+                memberDB.find({ memberID: parseInt(joinedClass.MemberID) }, function (err, docs) {
+                    if (docs.length == 0) {
+                        console.log("ERROR: Member ID Invalid")
+                    } else {
+                        if (docs[0].membership == 'level_3') {
+                            classDB.update({ classID: parseInt(joinedClass.ClassID) }, { $push: { enrolledMembers: parseInt(joinedClass.MemberID) } }, {}, function (err, numReplaced) {
+                                callback();
+                            });
+                            console.log(`Enrolled member #${parseInt(joinedClass.MemberID)} into class #${parseInt(joinedClass.ClassID)}`)
+                        } else if (docs[0].membership == 'level_2') {
+                            if (docs[0].classAllowance < 3) {
+                                classDB.update({ classID: parseInt(joinedClass.ClassID) }, { $push: { enrolledMembers: parseInt(joinedClass.MemberID) } }, {}, function (err, numReplaced) {
+                                    callback();
+                                });
+                                memberDB.update({ memberID: parseInt(joinedClass.MemberID) }, { $set: { classAllowance: docs[0].classAllowance + 1 } }, {}, function (err, numReplaced) {
+                                    callback();
+                                });
+                                console.log(`Enrolled member #${parseInt(joinedClass.MemberID)} into class #${parseInt(joinedClass.ClassID)}`)
+                            } else {
+                                console.log(`ERROR: Member #${parseInt(joinedClass.MemberID)}, has used their monthly classes`)
+                            }
+                        } else {
+                            console.log(`ERROR: Member #${parseInt(joinedClass.MemberID)}, does not have remaining classes`)
+                        }
+                    }
+                    vorpal.delimiter('gym$').show();
+                });
+            }
+        }
+        vorpal.delimiter('gym$').show();
+    });
+});
+vorpal.command('purchase class', 'purchase one-time access to a class').action(async function(args, callback){
+    let joinedClass = await JoinClass();
+    classDB.find({ classID: parseInt(joinedClass.ClassID) }, function (err, docs) {
+        if (docs.length == 0) {
+            console.log("ERROR: Class ID Invalid")
+        } else {
+            if (docs[0].enrolledMembers.length >= docs[0].sizeLimit) { 
+                console.log("ERROR: Class is at max capacity")
+            } else if (docs[0].enrolledMembers.includes(parseInt(joinedClass.MemberID))) {
+                console.log("ERROR: Member is already in this class")
+            } else {
+                memberDB.find({ memberID: parseInt(joinedClass.MemberID) }, function (err, docs) {
+                    if (docs.length == 0) {
+                        console.log("ERROR: Member ID Invalid")
+                    }else{
+                        // call the invoice command to add a balance to the member? 
+                        //have to set a price per class?
+                        // check if they have a member level first? Maybe surpased the amount of classes they get? adds complexity
+                        // 
+                    }
+});
+// ---------------------------------------------------------------------------
+
+vorpal.command('capacity', 'Display current capacity').action(function(args, callback) {
+    this.log(`\nCurrent Members: ${currentCap}/${maxCap}\n`);
+    callback();
+});
+
+vorpal.command('checkin', 'Check user into facility').action(async function(args, callback) {
+    const lastNameSearch = await prompts({
+        type: 'text',
+        name: 'value',
+        message: 'Last Name',
+    });
+
+    memberDB.find({ last: lastNameSearch.value.toLowerCase() }, async function (err, docs) {
+        console.log(`Member #${docs[0].memberID} checked in!`);
+        currentCap++;
+        vorpal.delimiter('gym$').show();
+    });
+
+    callback();
+});
+
+vorpal.command('checkout', 'Check user out of facility').action(async function(args, callback) {
+    const lastNameSearch = await prompts({
+        type: 'text',
+        name: 'value',
+        message: 'Last Name',
+    });
+
+    memberDB.find({ last: lastNameSearch.value.toLowerCase() }, async function (err, docs) {
+        console.log(`Member #${docs[0].memberID} checked out!`);
+        currentCap--;
+        vorpal.delimiter('gym$').show();
+    });
+
+    callback();
+});
+
+console.clear();
+
+>>>>>>> Stashed changes
 vorpal.delimiter('gym$').show();
